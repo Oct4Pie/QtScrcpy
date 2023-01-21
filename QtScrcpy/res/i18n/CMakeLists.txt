@@ -1,6 +1,6 @@
 ﻿# 声明ts文件
 set(QC_TS_FILES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/zh_CN.ts 
+    # ${CMAKE_CURRENT_SOURCE_DIR}/zh_CN.ts 
     ${CMAKE_CURRENT_SOURCE_DIR}/en_US.ts
 )
 # 设置qm文件生成目录

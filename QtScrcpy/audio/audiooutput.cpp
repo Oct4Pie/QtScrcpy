@@ -1,20 +1,22 @@
-#include <QTcpSocket>
-#include <QHostAddress>
+#include <QAudio>
+#include <QAudioDevice>
+#include <QAudioFormat>
 #include <QAudioOutput>
-#include <QTime>
+#include <QAudioSink>
 #include <QElapsedTimer>
+#include <QHostAddress>
+#include <QMediaDevices>
+#include <QTcpSocket>
+#include <QTime>
+
 
 #include "audiooutput.h"
 
-AudioOutput::AudioOutput(QObject *parent)
-    : QObject(parent)
+AudioOutput::AudioOutput(QObject *parent) : QObject(parent)
 {
-    connect(&m_sndcpy, &QProcess::readyReadStandardOutput, this, [this]() {
-        qInfo() << QString("AudioOutput::") << QString(m_sndcpy.readAllStandardOutput());
-    });
-    connect(&m_sndcpy, &QProcess::readyReadStandardError, this, [this]() {
-        qInfo() << QString("AudioOutput::") << QString(m_sndcpy.readAllStandardError());
-    });
+    connect(
+        &m_sndcpy, &QProcess::readyReadStandardOutput, this, [this]() { qInfo() << QString("AudioOutput::") << QString(m_sndcpy.readAllStandardOutput()); });
+    connect(&m_sndcpy, &QProcess::readyReadStandardError, this, [this]() { qInfo() << QString("AudioOutput::") << QString(m_sndcpy.readAllStandardError()); });
 }
 
 AudioOutput::~AudioOutput()
@@ -25,7 +27,7 @@ AudioOutput::~AudioOutput()
     stop();
 }
 
-bool AudioOutput::start(const QString& serial, int port)
+bool AudioOutput::start(const QString &serial, int port)
 {
     if (m_running) {
         stop();
@@ -102,27 +104,24 @@ void AudioOutput::startAudioOutput()
     if (m_audioOutput) {
         return;
     }
-
     QAudioFormat format;
     format.setSampleRate(48000);
     format.setChannelCount(2);
-    format.setSampleSize(16);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
+    // format.setSampleSize(16);
+    // format.setCodec("audio/pcm");
+    // format.setByteOrder(QAudioFormat::LittleEndian);
+    // format.setSampleType(QAudioFormat::Int16);
+    format.setSampleFormat(QAudioFormat::UInt8);
 
-    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+    QAudioDevice info(QMediaDevices::defaultAudioOutput());
     if (!info.isFormatSupported(format)) {
-        qWarning() << "AudioOutput::audio format not supported, cannot play audio.";
+        qWarning() << "Cannot play audio since the format is not supported";
         return;
     }
 
-    m_audioOutput = new QAudioOutput(format, this);
-    connect(m_audioOutput, &QAudioOutput::stateChanged, this, [](QAudio::State state) {
-        qInfo() << "AudioOutput::audio state changed:" << state;
-    });
-    m_audioOutput->setBufferSize(48000*2*15/1000 * 20);
-    m_outputDevice = m_audioOutput->start();
+    m_audioOutput = new QAudioSink(format, this);
+    connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(handleStateChanged(QAudio::State)));
+    m_audioOutput->start();
 }
 
 void AudioOutput::stopAudioOutput()
@@ -170,7 +169,6 @@ void AudioOutput::startRecvData(int port)
     });
     connect(audioSocket, &QTcpSocket::stateChanged, audioSocket, [](QAbstractSocket::SocketState state) {
         qInfo() << "AudioOutput::audio socket state changed:" << state;
-
     });
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     connect(audioSocket, &QTcpSocket::errorOccurred, audioSocket, [](QAbstractSocket::SocketError error) {

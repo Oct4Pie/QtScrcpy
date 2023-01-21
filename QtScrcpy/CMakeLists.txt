@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 # QC Custom config
 set(QC_PROJECT_NAME "QtScrcpy")
 # Read version numbers from file
-file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/version QC_FILE_VERSION)
+file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/../version QC_FILE_VERSION)
 set(QC_PROJECT_VERSION ${QC_FILE_VERSION})
 
 # Project declare
@@ -49,7 +49,7 @@ if (MSVC)
 
     message(STATUS "[${PROJECT_NAME}] Set Warnings as error")
     # warning level 3 and all warnings as errors
-    add_compile_options(/W3 /WX /wd4566)
+    # add_compile_options(/W3 /WX /wd4566)
 
     # avoid warning C4819
     add_compile_options(-source-charset:utf-8)
@@ -65,7 +65,7 @@ endif()
 if (NOT MSVC)
     message(STATUS "[${PROJECT_NAME}] Set warnings as error")
     # lots of warnings and all warnings as errors
-    add_compile_options(-Wall -Wextra -pedantic -Werror)
+    # add_compile_options(-Wall -Wextra -pedantic -Werror)
 
     # disable some warning
     add_compile_options(-Wno-nested-anon-types -Wno-c++17-extensions -Wno-overloaded-virtual)
@@ -81,6 +81,8 @@ set(CMAKE_AUTORCC ON)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network Multimedia REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network Multimedia REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS OpenGL) # for QOpenGLWidget
+find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets) # for QOpenGLWidget
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(QT NAMES Qt6 Qt5 COMPONENTS X11Extras REQUIRED)
     find_package(Qt${QT_VERSION_MAJOR} COMPONENTS X11Extras REQUIRED)
@@ -293,6 +295,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         # "" disable code sign
         XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
     )
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::OpenGL)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::OpenGLWidgets)
 
     # mac framework
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework AppKit")
@@ -319,6 +323,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         # pthread
         Threads::Threads
     )
+    
 
     # linux set app icon: https://blog.csdn.net/MrNoboday/article/details/82870853
 endif()

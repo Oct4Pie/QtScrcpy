@@ -5,6 +5,7 @@
 #include <QProcess>
 #include <QPointer>
 #include <QVector>
+#include <QAudioSink>
 
 class QAudioOutput;
 class QIODevice;
@@ -30,7 +31,7 @@ signals:
     void connectTo(int port);
 
 private:
-    QAudioOutput* m_audioOutput = nullptr;
+    QAudioSink* m_audioOutput = nullptr;
     QPointer<QIODevice> m_outputDevice;
     QThread m_workerThread;
     QProcess m_sndcpy;

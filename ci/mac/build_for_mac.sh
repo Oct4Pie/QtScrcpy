@@ -7,8 +7,8 @@ echo ---------------------------------------------------------------
 
 # 从环境变量获取必要参数
 # 例如 /Users/barry/Qt5.12.5/5.12.5
-echo ENV_QT_PATH $ENV_QT_PATH
-qt_cmake_path=$ENV_QT_PATH/clang_64/lib/cmake/Qt5
+echo /Users/$USER/Qt/QtDesignStudio/qt5_design_studio_reduced_version $ENV_QT_PATH
+qt_cmake_path=/$USER/m3hdi/Qt/QtDesignStudio/qt5_design_studio_reduced_version/lib/cmake/Qt5
 
 # 获取绝对路径，保证其他目录执行此脚本依然正确
 {
@@ -58,7 +58,7 @@ fi
 mkdir $build_path
 cd $build_path
 
-cmake_params="-DCMAKE_PREFIX_PATH=$qt_cmake_path -DCMAKE_BUILD_TYPE=$build_mode -G Xcode"
+cmake_params="-DCMAKE_PREFIX_PATH=$qt_cmake_path -DCMAKE_BUILD_TYPE=$build_mode -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13"
 cmake $cmake_params ../..
 if [ $? -ne 0 ] ;then
     echo "cmake failed"
