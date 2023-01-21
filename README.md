@@ -1,4 +1,4 @@
-# QtScrcpy 
+# QtScrcpy (with apple silicon support)
 
 [![Financial Contributors to Open Collective](https://opencollective.com/QtScrcpy/all/badge.svg?label=financial+contributors)](https://opencollective.com/QtScrcpy)
 ![Windows](https://github.com/barry-ran/QtScrcpy/workflows/Windows/badge.svg)
